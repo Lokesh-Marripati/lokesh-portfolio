@@ -1,11 +1,12 @@
 {
-  "name": "John_Doe",
+  "name":"anusha-portfolio",
   "version": "1.5.0",
   "description": "An elegant responsive bootstrap 4.x theme.",
   "main": "gulpfile.js",
-  "author": "DevCRUD",
+  "author": "Anusha",
   "scripts": {
-    "start": "gulp"
+    "start": "gulp",
+     "build-css": "sass src/styles.scss public/styles.css"
   },
   "devDependencies": {
     "browser-sync": "^2.26.3",
