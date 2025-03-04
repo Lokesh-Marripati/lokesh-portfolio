@@ -6,7 +6,9 @@
   "author": "Anusha",
   "scripts": {
     "start": "gulp",
-    "build-css": "sass src/styles.scss public/styles.css"
+    "build-css": "sass src/styles.scss public/styles.css",
+    "build": "gulp build",
+  "watch": "gulp watch"
   },
   "devDependencies": {
     "browser-sync": "^2.26.3",
