@@ -1,38 +1,39 @@
 // node.js Packages / Dependencies
-const gulp          = require('gulp');
-const sass          = require('gulp-sass');
-const uglify        = require('gulp-uglify');
-const rename        = require('gulp-rename');
-const concat        = require('gulp-concat');
-const cleanCSS      = require('gulp-clean-css');
-const imageMin      = require('gulp-imagemin');
-const pngQuint      = require('imagemin-pngquant'); 
-const browserSync   = require('browser-sync').create();
-const autoprefixer  = require('gulp-autoprefixer');
-const jpgRecompress = require('imagemin-jpeg-recompress'); 
-const clean         = require('gulp-clean');
+const gulp = require('gulp');
+const sass = require('gulp-sass')(require('sass'));
+const uglify = require('gulp-uglify');
+const rename = require('gulp-rename');
+const concat = require('gulp-concat');
+const cleanCSS = require('gulp-clean-css');
+const browserSync = require('browser-sync').create();
+const autoprefixer = require('gulp-autoprefixer');
+const clean = require('gulp-clean');
 
+// Dynamic imports for ESM modules
+const loadImagemin = async () => (await import('gulp-imagemin')).default;
+const loadJpegtran = async () => (await import('imagemin-jpegtran')).default;
+const loadPngquant = async () => (await import('imagemin-pngquant')).default;
 
 // Paths
 var paths = {
     root: { 
-        www:        './public_html'
+        www: './public_html'
     },
     src: {
-        root:       'public_html/assets',
-        html:       'public_html/**/*.html',
-        css:        'public_html/assets/css/*.css',
-        js:         'public_html/assets/js/*.js',
-        vendors:    'public_html/assets/vendors/**/*.*',
-        imgs:       'public_html/assets/imgs/**/*.+(png|jpg|gif|svg)',
-        scss:       'public_html/assets/scss/**/*.scss'
+        root: 'public_html/assets',
+        html: 'public_html/**/*.html',
+        css: 'public_html/assets/css/*.css',
+        js: 'public_html/assets/js/*.js',
+        vendors: 'public_html/assets/vendors/**/*.*',
+        imgs: 'public_html/assets/imgs/**/*.+(png|jpg|gif|svg)',
+        scss: 'public_html/assets/scss/**/*.scss'
     },
     dist: {
-        root:       'public_html/dist',
-        css:        'public_html/dist/css',
-        js:         'public_html/dist/js',
-        imgs:       'public_html/dist/imgs',
-        vendors:    'public_html/dist/vendors'
+        root: 'public_html/dist',
+        css: 'public_html/dist/css',
+        js: 'public_html/dist/js',
+        imgs: 'public_html/dist/imgs',
+        vendors: 'public_html/dist/vendors'
     }
 }
 
@@ -65,34 +66,36 @@ gulp.task('js', function() {
 });
 
 // Compress (JPEG, PNG, GIF, SVG, JPG)
-gulp.task('img', function(){
+gulp.task('img', async function() {
+    const imagemin = await loadImagemin();
+    const jpegtran = await loadJpegtran();
+    const pngquant = await loadPngquant();
+
     return gulp.src(paths.src.imgs)
-    .pipe(imageMin([
-        imageMin.gifsicle(),
-        imageMin.jpegtran(),
-        imageMin.optipng(),
-        imageMin.svgo(),
-        pngQuint(),
-        jpgRecompress()
+    .pipe(imagemin([
+        imagemin.gifsicle(),
+        jpegtran(),
+        imagemin.optipng(),
+        imagemin.svgo(),
+        pngquant()
     ]))
     .pipe(gulp.dest(paths.dist.imgs));
 });
 
-// copy vendors to dist
+// Copy vendors to dist
 gulp.task('vendors', function(){
     return gulp.src(paths.src.vendors)
     .pipe(gulp.dest(paths.dist.vendors))
 });
 
-// clean dist
+// Clean dist
 gulp.task('clean', function () {
-    return gulp.src(paths.dist.root)
+    return gulp.src(paths.dist.root, { allowEmpty: true, read: false })
         .pipe(clean());
 });
 
 // Prepare all assets for production
 gulp.task('build', gulp.series('sass', 'css', 'js', 'vendors', 'img'));
-
 
 // Watch (SASS, CSS, JS, and HTML) reload browser on change
 gulp.task('watch', function() {
@@ -105,3 +108,6 @@ gulp.task('watch', function() {
     gulp.watch(paths.src.js).on('change', browserSync.reload);
     gulp.watch(paths.src.html).on('change', browserSync.reload);
 });
+
+// Default task
+gulp.task('default', gulp.series('build', 'watch'));

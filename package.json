@@ -1,37 +1,34 @@
 {
-  "name":"anusha-portfolio",
-  "version": "1.5.0",
+  "name": "anusha-portfolio",
+  "version": "1.5.1",
   "description": "An elegant responsive bootstrap 4.x theme.",
   "main": "gulpfile.js",
   "author": "Anusha",
   "scripts": {
     "start": "gulp",
-     "build-css": "sass src/styles.scss public/styles.css"
+    "build-css": "sass src/styles.scss public/styles.css"
   },
   "devDependencies": {
     "browser-sync": "^2.26.3",
-    "gulp": "^4.0.0",
-    "gulp-clean-css": "^4.0.0",
-    "gulp-sass": "^4.0.2",
-    "gulp-autoprefixer": "^6.1.0",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-sass": "^5.1.0", 
+    "gulp-autoprefixer": "^8.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
-    "gulp-imagemin": "^5.0.3",
-    "gulp-rename": "^1.4.0",
+    "gulp-imagemin": "^8.0.0",
+    "gulp-rename": "^2.0.0",
     "gulp-uglify": "^3.0.2",
-    "imagemin-jpeg-recompress": "^6.0.0",
-    "imagemin-pngquant": "^7.0.0"
+    "imagemin": "^8.0.0",
+   "imagemin-jpegtran": "^8.0.0",
+    "imagemin-pngquant": "^9.0.0",
+    "sass": "^1.75.0"
   },
   "browserslist": [
     "> 1%",
-    "ie >= 8",
-    "edge >= 15",
-    "ie_mob >= 10",
-    "ff >= 45",
-    "chrome >= 45",
-    "safari >= 7",
-    "opera >= 23",
-    "ios >= 7",
-    "android >= 4"
+    "last 2 versions",
+    "not dead",
+    "ie >= 11"
   ]
 }
+
