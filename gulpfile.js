@@ -30,7 +30,7 @@ var paths = {
         scss: 'public_html/assets/scss/**/*.scss'
     },
     dist: {
-        root: 'dist',
+        root: 'public_html/dist',
         css: 'public_html/dist/css',
         js: 'public_html/dist/js',
         imgs: 'public_html/dist/imgs',
