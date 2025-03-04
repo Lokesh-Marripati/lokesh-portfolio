@@ -13,6 +13,7 @@ const clean = require('gulp-clean');
 const loadImagemin = async () => (await import('gulp-imagemin')).default;
 const loadJpegtran = async () => (await import('imagemin-jpegtran')).default;
 const loadPngquant = async () => (await import('imagemin-pngquant')).default;
+const loadGifsicle = async () => (await import('imagemin-gifsicle')).default;
 
 // Paths
 var paths = {
@@ -65,21 +66,25 @@ gulp.task('js', function() {
     .pipe(browserSync.stream());
 });
 
-// Compress (JPEG, PNG, GIF, SVG, JPG)
+// Compress images
 gulp.task('img', async function() {
-    const imagemin = await loadImagemin();
-    const jpegtran = await loadJpegtran();
-    const pngquant = await loadPngquant();
+    try {
+        const imagemin = await loadImagemin();
+        const jpegtran = await loadJpegtran();
+        const pngquant = await loadPngquant();
+        const gifsicle = await loadGifsicle();
 
-    return gulp.src(paths.src.imgs)
-    .pipe(imagemin([
-        imagemin.gifsicle(),
-        jpegtran(),
-        imagemin.optipng(),
-        imagemin.svgo(),
-        pngquant()
-    ]))
-    .pipe(gulp.dest(paths.dist.imgs));
+        return gulp.src(paths.src.imgs)
+        .pipe(imagemin([
+            gifsicle({ interlaced: true }),
+            jpegtran({ progressive: true }),
+            pngquant({ quality: [0.6, 0.8] }),
+            imagemin.svgo()
+        ]))
+        .pipe(gulp.dest(paths.dist.imgs));
+    } catch (err) {
+        console.error('Image compression failed:', err);
+    }
 });
 
 // Copy vendors to dist
@@ -97,17 +102,19 @@ gulp.task('clean', function () {
 // Prepare all assets for production
 gulp.task('build', gulp.series('sass', 'css', 'js', 'vendors', 'img'));
 
-// Watch (SASS, CSS, JS, and HTML) reload browser on change
+// Watch for changes and reload
 gulp.task('watch', function() {
     browserSync.init({
         server: {
             baseDir: paths.root.www
         } 
-    })
+    });
     gulp.watch(paths.src.scss, gulp.series('sass'));
-    gulp.watch(paths.src.js).on('change', browserSync.reload);
+    gulp.watch(paths.src.js, gulp.series('js'));
     gulp.watch(paths.src.html).on('change', browserSync.reload);
 });
 
 // Default task
 gulp.task('default', gulp.series('build', 'watch'));
+
+
