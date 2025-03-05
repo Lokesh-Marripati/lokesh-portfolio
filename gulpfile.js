@@ -38,22 +38,29 @@ var paths = {
     }
 }
 
-// Compile SCSS
+// Copy HTML to dist
+gulp.task('copy-html', function() {
+    return gulp.src(paths.src.html)
+    .pipe(gulp.dest(paths.dist.root));
+});
+
+// Compile SCSS and move to dist
 gulp.task('sass', function() {
     return gulp.src(paths.src.scss)
     .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError)) 
     .pipe(autoprefixer())
-    .pipe(gulp.dest(paths.src.root + '/css'))
+    .pipe(gulp.dest(paths.dist.css))
     .pipe(browserSync.stream());
 });
 
 // Minify + Combine CSS
 gulp.task('css', function() {
-    return gulp.src(paths.src.css)
+    return gulp.src(paths.dist.css + '/*.css')
     .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(concat('johndoe.css'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest(paths.dist.css))
+    .pipe(browserSync.stream());
 });
 
 // Minify + Combine JS
@@ -100,21 +107,19 @@ gulp.task('clean', function () {
 });
 
 // Prepare all assets for production
-gulp.task('build', gulp.series('sass', 'css', 'js', 'vendors', 'img'));
+gulp.task('build', gulp.series('clean', 'sass', 'css', 'js', 'vendors', 'img', 'copy-html'));
 
 // Watch for changes and reload
 gulp.task('watch', function() {
     browserSync.init({
         server: {
-            baseDir: paths.root.www
+            baseDir: paths.dist.root
         } 
     });
-    gulp.watch(paths.src.scss, gulp.series('sass'));
+    gulp.watch(paths.src.scss, gulp.series('sass', 'css'));
     gulp.watch(paths.src.js, gulp.series('js'));
-    gulp.watch(paths.src.html).on('change', browserSync.reload);
+    gulp.watch(paths.src.html, gulp.series('copy-html')).on('change', browserSync.reload);
 });
 
 // Default task
 gulp.task('default', gulp.series('build', 'watch'));
-
-
